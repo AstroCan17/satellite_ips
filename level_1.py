@@ -650,7 +650,6 @@ class Denoiser:
             rows, cols = img.shape
             crow, ccol = rows // 2, cols // 2
 
-
             val = 1
             if val == 1:
                 if name[-1] == 6:

@@ -221,7 +221,8 @@ def run_algorithm(input_dict,save_path):
 
     return integrator.save_path, integrated_image
     
-
+    def siksok(self):
+        pass
 
 if __name__ == '__main__':
 

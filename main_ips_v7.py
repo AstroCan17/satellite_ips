@@ -241,7 +241,6 @@ class generators:
     def __init__(self):
         
         pass
-        
 
     def img_dict_generator_func(self,path_dict,lost_package_check=False):
         if lost_package_check:
@@ -364,8 +363,6 @@ def main():
     save_dir,coreg_rgb_img = coreg.run_algorithm(sharp_img_generator,save_path)
     # coreg_rgb_img = cv2.imread(r"D:\03_cdk_processing\05_github_v2\01_deneme\01_anit\28\03_rgb\16b_images\CT21_registered_rgb_12b.tif", cv2.IMREAD_UNCHANGED)
     georef.run_georef(save_path,coreg_rgb_img)
-
-
 
 
     pansharp.run_pansharp(save_path)

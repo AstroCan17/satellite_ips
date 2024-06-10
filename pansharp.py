@@ -24,7 +24,6 @@ class PanSharpening:
         pan_image_8b = (((pan_img_test - pan_img_test.min()) / (pan_img_test.max() - pan_img_test.min())) * 255).astype('uint8')
 
 
-
         # apply clahe to rgb image
         def apply_clahe(channel):
             clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -100,6 +99,8 @@ class PanSharpening:
         output_path = r"D:\03_cdk_processing\03_IPS_pipeline\01_reprocess\06_anitkabir\02_implement\05\ps\toa"
         cv2.imwrite(output_path + "/pan_sharpened.tif", sharpened_image)
         cv2.imwrite(output_path + "/pan_sharpened_8b.tif", sharp_8b)
+
+
 
 def run_pansharp(save_path):
 
