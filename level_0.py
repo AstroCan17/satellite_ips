@@ -42,7 +42,7 @@ class Decoder:
             for i in range(0, img_data.shape[0] - 1):
                 current_row = img_data[i]
                 next_row = img_data[i + 1]
-                # Eğer şimdiki satır 0 değilse ve bir sonraki satır tamamen 0 ise
+            
                 if not np.all(current_row == 0) and np.all(next_row == 0):
                     lost_package_line_start = i + 1
                     cut_lines.append(lost_package_line_start)

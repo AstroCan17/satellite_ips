@@ -17,9 +17,8 @@ from math import sqrt
 
 class NUC:
     def __init__(self):
-        self.LUT_dark_offset = {'b1':  102.643, 'b2':110.724,'b3':107.779,'b4':108.047,'b5': 112.521,'b6': 114.882,
-                                'b7': 121.459,'b8': 126.587,'b9': 123.387,'b10': 117.850,'b11': 112.320}
-    
+        self.LUT_dark_offset = None
+
     def save_to_folder(self,title_written):
         root = Tk()
         root.filename = filedialog.askdirectory(initialdir="", title=title_written)
@@ -56,243 +55,31 @@ class NUC:
             yield (f"noiseFree_{key}", denoised_band_clipped)
 
     def compute_nuc(self,workspace_darkfield,workspace_flatfield,noise_dict,cut_dark ="",cut_flat = "",save = False,bpr =False,remove_noise = False):
-        if isinstance(workspace_darkfield, dict):
-            workspace_darkfield = workspace_darkfield
-        else:
-            workspace_darkfield = dict(workspace_darkfield)
-        if isinstance(workspace_flatfield, dict):
-            workspace_flatfield = workspace_flatfield
-        else:
-            workspace_flatfield = dict(workspace_flatfield)
-        if isinstance(noise_dict, dict):
-            noise_dict = noise_dict
-        else:
-            noise_dict = dict(noise_dict)
+        """
+        Passed due to NDA. New methods will be added soon 
+        """
+        pass
 
-        if save:
-            save_path = ""
-            save_path = self.save_to_folder(title_written="Select folder to save gain and offset files")
-
-        gain_dict = {}
-        offset_dict = {}
-
-        if remove_noise:
-            workspace_darkfield = self.noise_remover(workspace_darkfield, noise_dict)
-            workspace_flatfield = self.noise_remover(workspace_flatfield, noise_dict)
-            if isinstance(workspace_darkfield, dict):
-                pass
-            else:
-                workspace_darkfield = dict(workspace_darkfield)
-            if isinstance(workspace_flatfield, dict):
-                pass
-            else:
-                workspace_flatfield = dict(workspace_flatfield)
-        else:
-            pass
-
-        band_list_darkfield = [int(key[-1:]) for key in workspace_darkfield.keys()]
-
-
-        for i,b in enumerate(band_list_darkfield):
-            for key in workspace_darkfield.keys():
-                if key.endswith(str(b)):
-                    
-                    darkfield_frame = workspace_darkfield[key]
-                    
-                                                          
-            for key in workspace_flatfield.keys():
-                if key.endswith(str(b)):                                       
-                    flatfield_frame = workspace_flatfield[key]
-                    
-            # print(f"darkfield mean of band_{b}: {np.mean(darkfield_frame)} ", f"flatfield mean of band_{b}: {np.mean(flatfield_frame)}")
-
-            if cut_dark != 0 and cut_flat != 0:
-                if b ==6:
-                    darkfield_frame = darkfield_frame[int(cut_dark*2):,:]
-                    flatfield_frame = flatfield_frame[int(cut_flat*2):,:]
-
-                else:
-                    darkfield_frame = darkfield_frame[int(cut_dark):,:]
-                    flatfield_frame = flatfield_frame[int(cut_dark):,:]
-            else:
-                pass
-
-
-            flatfield_frame = np.float32(flatfield_frame)
-            darkfield_frame = np.float32(darkfield_frame)
-
-            # Calculate the mean of each column
-            flatfield_frame = np.mean(flatfield_frame, axis=0)
-            darkfield_frame = np.mean(darkfield_frame, axis=0)
-
-
-            # Calculate gain and offset
-            gain = (np.mean(flatfield_frame) - np.mean(darkfield_frame)) / (flatfield_frame - darkfield_frame)
-            offset = np.mean(flatfield_frame)-gain *flatfield_frame
-
-            if bpr:
-                # Identify bad pixels
-                if max_val and min_val is not None:
-                    max_val = float(max_val)
-                    min_val = float(min_val)
-                    bad_pixels = (gain >= max_val) | (gain <= min_val)
-                    gain[bad_pixels] = np.mean(gain)
-                    offset[bad_pixels] = np.mean(offset)
-                else:
-                    bad_pixels = None
-            else:
-                pass
-            gain_dict[f'gain_{b}'] = gain
-            # print(f"mean of gain_{b}: {np.mean(gain)}")
-            offset_dict[f'offset_{b}'] = offset
-            # print(f"mean of offset_{b}: {np.mean(offset)}")
-
-            if save:
-                np.savetxt(f"{save_path}/gain_{b}.txt", gain)
-                np.savetxt(f"{save_path}/offset_{b}.txt", offset)
-        
-        if bpr:
-            return gain_dict, offset_dict, bad_pixels
-        else:
-            return gain_dict, offset_dict, None
-    
-            
-        
-    
     def read_nuc_files(self,common_bands = None):
         """
-        Reads the nuc files and returns the gain and offset dictionaries.
-        Returns:
-            gain_dict (dict): A dictionary containing the gain values for each band.
-            offset_dict (dict): A dictionary containing the offset values for each band.
+        Passed due to NDA. New methods will be added soon 
         """
-        root = Tk()
-        # select txt files
-        root.directory = filedialog.askdirectory(initialdir="", title="Select txt files")
-        directory = root.directory
-        root.destroy()
+        pass
 
-        gain_dict = {}
-        offset_dict = {}
-        if common_bands is not None:
-            for file_name in os.listdir(directory):
-                file_path = os.path.join(directory, file_name)
-                
-                file_index = file_name.split(".")[0]
-                file_index = "b"+file_index[-1]
-                if file_path.endswith(".txt"):
-                    if file_index in common_bands:
-                        if "gain" in file_name:
-                            band_num = file_name.split("_")[1].split(".")[0]
-                            gain = np.loadtxt(file_path)
-                            gain_dict[f"gain_{band_num}"] = gain
-                        elif "offset" in file_name:
-                            band_num = file_name.split("_")[1].split(".")[0]
-                            offset = np.loadtxt(file_path)
-                            offset_dict[f"offset_{band_num}"] = offset
-        else:
-            for file_name in os.listdir(directory):
-                file_path = os.path.join(directory, file_name)
-                if file_path.endswith(".txt"):
-                    if "gain" in file_name:
-                        band_num = file_name.split("_")[1].split(".")[0]
-                        gain = np.loadtxt(file_path)
-                        gain_dict[f"gain_{band_num}"] = gain
-                    elif "offset" in file_name:
-                        band_num = file_name.split("_")[1].split(".")[0]
-                        offset = np.loadtxt(file_path)
-                        offset_dict[f"offset_{band_num}"] = offset
-        return gain_dict, offset_dict, None
-                    
-                    
    
 
     
     def apply_nuc_and_bpr(self,orbit_generator,gain_dict,offset_dict,common_band_list,bad_pixels,save_img = False):
-        print("Level-0 processing finished.")
-        print("Level-1 processing started...")
-        print("Non-uniformity correction started...")
-        print("Note:  Flatfielding and non-uniformity correction are performed simultaneously and referred to here as Non Uniformity Correction (NUC).")
-        if isinstance(orbit_generator, dict):
-            orbit_dict = orbit_generator
-        else:
-            orbit_dict = dict(orbit_generator)
-        if isinstance(gain_dict, dict):
-            gain_dict = gain_dict
-        else:
-            gain_dict = dict(gain_dict)
-        if isinstance(offset_dict, dict):
-            offset_dict = offset_dict
-        else:
-            offset_dict = dict(offset_dict)
-
-        if save_img == True:
-            save_path = NUC.save_to_folder(self,title_written="Select folder to save nuc images")
-            # if not os.path.exists(f"{save_path}/16b_images"):
-            #     os.makedirs(f"{save_path}/16b_images")
-            # if not os.path.exists(f"{save_path}/8b_images"):
-            #     os.makedirs(f"{save_path}/8b_images")
-        else:
-            pass
-
-        gain_dict_values = list(gain_dict.values())
-        offset_dict_values = list(offset_dict.values())
-
-        for i,(name,img) in enumerate(orbit_dict.items()):
-            img = np.float32(img)
-            
-            gain = gain_dict_values[i]
-            offset = offset_dict_values[i]
-            key = name[-1]
-            dark_offset = self.LUT_dark_offset[f"b{key}"]
-
-            nuc_bpr_frame = np.zeros(img.shape, dtype=np.float32)
-            nuc_bpr_frame = img*gain + offset-dark_offset
-
-            if bad_pixels is not None:
-                # handle bad pixels
-                if bad_pixels[0]:
-                    valid_index = np.argwhere(bad_pixels == False)[0][0]
-                    nuc_bpr_frame[:, 0] = nuc_bpr_frame[:, valid_index]
-                for ctr in range(1, len(bad_pixels) - 1):
-                    if bad_pixels[ctr]:
-                        if bad_pixels[ctr + 1]:
-                            nuc_bpr_frame[:, ctr] = nuc_bpr_frame[:, ctr - 1]
-                        else:
-                            nuc_bpr_frame[:, ctr] = (nuc_bpr_frame[:, ctr - 1] + nuc_bpr_frame[:, ctr + 1]) / 2
-                if bad_pixels[-1]:
-                    nuc_bpr_frame[:, -1] = nuc_bpr_frame[:, -2]
-            else:
-                pass
-
-            yield (f"nuc_bpr_{name[-1]}", nuc_bpr_frame)
-
-            if save_img == True:
-                # cv2.imwrite(f"{save_path}/CT21_nuc_band_b{name[-1]}.tif", NUC.orientation_tek(self,nuc_bpr_frame))
-                print("Saving the NUC band {}...".format(name[-1]))
-                cv2.imwrite(f"{save_path}/CT21_nuc_band_b{name[-1]}.tif", nuc_bpr_frame)
-            #     cv2.imwrite(f"{save_path}/16b_images/CT21_nuc_band_{name[-1]}.tif", NUC.orientation_tek(self,nuc_bpr_frame))
-            #     cv2.imwrite(f"{save_path}/16b_images/CT21_raw_band_{name[-1]}.tif", NUC.orientation_tek(self,img))
-            #     nuc_img_8b = (((nuc_bpr_frame - np.min(nuc_bpr_frame)) / (np.max(nuc_bpr_frame) - np.min(nuc_bpr_frame)))*255).astype(np.uint8)
-            #     raw_img_8b = (((img - np.min(img)) / (np.max(img) - np.min(img)))*255).astype(np.uint8)
-            #     cv2.imwrite(f"{save_path}/8b_images/CT21_nuc_band_{name[-1]}_8b.tif", NUC.orientation_tek(self,nuc_img_8b))
-            #     cv2.imwrite(f"{save_path}/8b_images/CT21_raw_band_{name[-1]}_8b.tif", NUC.orientation_tek(self,raw_img_8b))
-            # else:
-            #     pass
+        """
+        Passed due to NDA. New methods will be added soon 
+        """
+        pass
 
 
 class SatelliteAttitude:
     def __init__(self):
-        self.satellite_id = "CONNECTA T2.1"
+        self.satellite_id = ""
         
-
-    def get_tle(self):
-        # ConnectaT2_1_TLE = tlefile.read(self.satellite)
-        # Line1 = ConnectaT2_1_TLE.line1
-        # Line2 = ConnectaT2_1_TLE.line2
-        Line1 = '1 25544U 98067A   19141.19851322  .00000663  00000-0  18020-4 0  9997'
-        Line2 = '2 25544  51.6411 135.2638 0001720  14.4836 102.9344 15.52691834171066'
-        return Line1, Line2
 
     def get_satellite_position(self, Line1, Line2):
         satellite = EarthSatellite(Line1, Line2)
@@ -315,10 +102,7 @@ class TOA:
 
     
     def get_tle(self):
-
-        Line1 = '1 25544U 98067A   19141.19851322  .00000663  00000-0  18020-4 0  9997'
-        Line2 = '2 25544  51.6411 135.2638 0001720  14.4836 102.9344 15.52691834171066'
-        return Line1, Line2
+        pass
 
     def get_sun_el_esdist(self):
         Line1, Line2 = self.get_tle()
@@ -333,41 +117,13 @@ class TOA:
         return sun_elevation,es_distance,sun_zenith
     
     def get_ESUN(self,band):
-        # mean solar irradiance ESUN
-        if band == 1:
-            ESUN = 1913.0
-        elif band == 2:
-            ESUN = 1965.0
-        elif band == 3:
-            ESUN = 1823.0
-        elif band == 4:
-            ESUN = 1512.0
-        elif band == 5:
-            ESUN = 1039.0
-        elif band == 6:
-            ESUN = 215.0
-        elif band == 7:
-            ESUN = 225.7
-        elif band == 8:
-            ESUN = 82.07
-        elif band == 9:
-            ESUN = 1368.0
-        elif band == 10:
-            ESUN = 85.27
-        elif band == 11:
-            ESUN = 79.72
-        else:
-            ESUN = None
-        return ESUN
-
+        """
+        Passed due to NDA. New methods will be added soon 
+        """
+        pass
 
     def dn_to_radiance(self,dict_generator,save_path,save_img = False):
         print("Radiance conversion is activated...")
-        # if save_img:
-        #     root = Tk()
-        #     root.save_path = filedialog.askdirectory(initialdir="", title="Select folder to save TOA images")
-        #     directory = root.save_path
-        #     root.destroy()
         if isinstance(dict_generator, dict):
             input_dict = dict_generator
         else:
@@ -465,10 +221,10 @@ class sharpening:
             if save_img:
         
                 print("Saving the sharpened images...")
-                cv2.imwrite(f"{save_path}/02_denoised/16b_images/CT21_wiener_deconv_b{key[-1]}.tif", img)
+                cv2.imwrite(f"{save_path}/02_denoised/16b_images/_wiener_deconv_b{key[-1]}.tif", img)
                 img_8b = (((img - np.min(img)) / (np.max(img) - np.min(img)))*255).astype(np.uint8)
 
-                cv2.imwrite(f"{save_path}/02_denoised/8b_images/CT21_wiener_deconv_b{key[-1]}_8b.tif", img_8b)
+                cv2.imwrite(f"{save_path}/02_denoised/8b_images/_wiener_deconv_b{key[-1]}_8b.tif", img_8b)
             else:
                 pass
             yield "Sharpened_b"+key[-1],img
@@ -514,9 +270,9 @@ class Denoiser:
             img_inverted = pca.inverse_transform(img_transformed)
             img_inverted = np.clip(img_inverted, 0, (2**12)-1).astype(np.uint16)
             if save_img:
-                cv2.imwrite(f"{save_path}/16b_images/CT21_pca_denoised_band_{key[-1]}.tif", NUC.orientation_tek(self,img_inverted))
+                cv2.imwrite(f"{save_path}/16b_images/_pca_denoised_band_{key[-1]}.tif", NUC.orientation_tek(self,img_inverted))
                 img_8b = (((img_inverted - np.min(img_inverted)) / (np.max(img_inverted) - np.min(img_inverted)))*255).astype(np.uint8)
-                cv2.imwrite(f"{save_path}/8b_images/CT21_pca_denoised_band_{key[-1]}_8b.tif", NUC.orientation_tek(self,img_8b))
+                cv2.imwrite(f"{save_path}/8b_images/_pca_denoised_band_{key[-1]}_8b.tif", NUC.orientation_tek(self,img_8b))
                 yield "PCA_"+key, img_inverted
             else:
                 yield "PCA_"+key, img_inverted
@@ -540,9 +296,9 @@ class Denoiser:
             filt_sig = np.clip(filt_sig, 0, (2**12)-1).astype(np.uint16)
             if save_img:
                 
-                cv2.imwrite(f"{save_path}/16b_images/CT21_denoised_band_{key[-1]}.tif", NUC.orientation_tek(self,filt_sig))
+                cv2.imwrite(f"{save_path}/16b_images/_denoised_band_{key[-1]}.tif", NUC.orientation_tek(self,filt_sig))
                 img_8b = (((filt_sig - np.min(filt_sig)) / (np.max(filt_sig) - np.min(filt_sig)))*255).astype(np.uint8)
-                cv2.imwrite(f"{save_path}/8b_images/CT21_denoised_band_{key[-1]}_8b.tif", NUC.orientation_tek(self,img_8b))
+                cv2.imwrite(f"{save_path}/8b_images/_denoised_band_{key[-1]}_8b.tif", NUC.orientation_tek(self,img_8b))
                 yield "dNoised_"+key, filt_sig
             else:
                 yield "dNoised_"+key, filt_sig
@@ -611,9 +367,9 @@ class Denoiser:
 
             value = value.clip(0, 2**12-1).astype(np.uint16)
             if save_img:
-                cv2.imwrite(f"{save_path}/16b_images/CT21_gaussian_filtered_band_{key[-1]}.tif", NUC.orientation_tek(self,value))
+                cv2.imwrite(f"{save_path}/16b_images/_gaussian_filtered_band_{key[-1]}.tif", NUC.orientation_tek(self,value))
                 value_8b = (((value - np.min(value)) / (np.max(value) - np.min(value)))*255).astype(np.uint8)
-                cv2.imwrite(f"{save_path}/8b_images/CT21_gaussian_filtered_band_{key[-1]}_8b.tif", NUC.orientation_tek(self,value_8b))
+                cv2.imwrite(f"{save_path}/8b_images/_gaussian_filtered_band_{key[-1]}_8b.tif", NUC.orientation_tek(self,value_8b))
             else:
                 pass
             yield "Gaussian_b"+key[-1], value
@@ -731,9 +487,9 @@ class Denoiser:
             
             yield f'butterworth_b{name[-1]}', denoised_img
             if save_img:
-                cv2.imwrite(f"{save_path}/16b_images/CT21_butterworth_filtered_band_{name[-1]}.tif", denoised_img)
+                cv2.imwrite(f"{save_path}/16b_images/_butterworth_filtered_band_{name[-1]}.tif", denoised_img)
                 denoised_img_8b = (((denoised_img - np.min(denoised_img)) / (np.max(denoised_img) - np.min(denoised_img)))*255).astype(np.uint8)
-                cv2.imwrite(f"{save_path}/8b_images/CT21_butterworth_filtered_band_8b_{name[-1]}.tif", denoised_img_8b)
+                cv2.imwrite(f"{save_path}/8b_images/_butterworth_filtered_band_8b_{name[-1]}.tif", denoised_img_8b)
 
 
 def main():

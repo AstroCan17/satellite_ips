@@ -29,22 +29,21 @@ class image_processing:
 
 
     def find_common_bands(self, paths):
-        # Her bir klasördeki bant numaralarını tutacak listeleri oluştur
+
         bands_per_path = []
         for path in paths:
             bands = set()
             for filename in os.listdir(path):
                 if filename.endswith('.tif'):
-                    # Bant numarasını dosya adından çıkartın
+
                     band = filename.split('_')[-1].split('.')[0]
                     bands.add(band)
             bands_per_path.append(bands)
         
-        # Listelerin kesişimini alarak ortak bant numaralarını bul
         common_bands = set.intersection(*bands_per_path)
-        # bant isimlerininin son hanesine göre artan sırada sırala
+
         common_bands = sorted(common_bands, key=lambda x: int(x[-1]))
-        # print(f"Common bands: {common_bands}")
+
         return common_bands
 
     
@@ -90,7 +89,7 @@ class image_processing:
             images_dict = dict(images_generator)
 
         plt.figure(figsize=(20, 10))
-        # eğer images_generator boş ise hata ver
+
 
         for i, (band, img) in enumerate(images_dict.items()):
             img_8b = (((img - np.min(img)) / (np.max(img) - np.min(img))) * 255).astype(np.uint8)
@@ -110,7 +109,7 @@ class image_processing:
 
     def plot_signal(self,input_generator,common_bands_list, denoised_generator=None, only_signal_show=False):
         print("Plotting the signals...")
-        # check if input_generator is generator or dictionary
+
         if isinstance(input_generator, dict):
             input_dict = input_generator
         else:
@@ -294,7 +293,7 @@ def main():
     # initialize the time counter to measure the performance
     start_time = time.time()
     global orbit_path,darkfield_path,flatfield_path, common_bands, gain_dict, offset_dict, bad_pixels
-    # Create an instance of the SignalDenoising class
+    
     global decoder, nuc, generator, toa, sharp, val,denoised_start,coreg
     
     ips = image_processing(N=60)
@@ -310,12 +309,10 @@ def main():
     denoiser = level_1.Denoiser(N=60)
     georef = georeferencing_v1
     
-    # run_regist = band_coreg.run_algorithm()
-   
-    
+
     print("Level-0 processing started...")
     print("Choose orbit folder: ")
-    # orbit_path  = r"D:\03_cdk_processing\04_github\04_deneme\02_cut_nuc"
+
     orbit_path = filedialog.askdirectory(initialdir="", title="Select orbit folder")
     print("Would you like to calculate gain and offset values for NUC? (y/n)")
     # answer = input()
@@ -352,16 +349,16 @@ def main():
 
 
     orbit_generator = generator.img_dict_generator_func(orbit_path,lost_package_check=False)
-    save_path = r"D:\03_cdk_processing\05_github_v2\01_deneme\01_anit\28"
+    save_path = ""
 
-    # # # toa_img_generator = toa.dn_to_radiance(orbit_generator,save_path,save_img = True)
-    butterworth_denoised = denoiser.get_filtered_butterworth(orbit_generator,cutoff_inp= 0.2,squared_butterworth=False, order=10.0, npad=0, save_img=False)
+    toa_img_generator = toa.dn_to_radiance(orbit_generator,save_path,save_img = True)
+    butterworth_denoised = denoiser.get_filtered_butterworth(toa_img_generator,cutoff_inp= 0.2,squared_butterworth=False, order=10.0, npad=0, save_img=False)
     
 
     sharp_img_generator = sharp.deconvolution_kernel(butterworth_denoised,save_path,save_img = True)
 
     save_dir,coreg_rgb_img = coreg.run_algorithm(sharp_img_generator,save_path)
-    # coreg_rgb_img = cv2.imread(r"D:\03_cdk_processing\05_github_v2\01_deneme\01_anit\28\03_rgb\16b_images\CT21_registered_rgb_12b.tif", cv2.IMREAD_UNCHANGED)
+ 
     georef.run_georef(save_path,coreg_rgb_img)
 
 
