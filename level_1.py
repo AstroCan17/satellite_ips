@@ -56,13 +56,13 @@ class NUC:
 
     def compute_nuc(self,workspace_darkfield,workspace_flatfield,noise_dict,cut_dark ="",cut_flat = "",save = False,bpr =False,remove_noise = False):
         """
-        Passed due to NDA. New methods will be added soon 
+        New methods will be added soon 
         """
         pass
 
     def read_nuc_files(self,common_bands = None):
         """
-        Passed due to NDA. New methods will be added soon 
+        New methods will be added soon 
         """
         pass
 
@@ -71,7 +71,7 @@ class NUC:
     
     def apply_nuc_and_bpr(self,orbit_generator,gain_dict,offset_dict,common_band_list,bad_pixels,save_img = False):
         """
-        Passed due to NDA. New methods will be added soon 
+         New methods will be added soon 
         """
         pass
 
@@ -118,7 +118,7 @@ class TOA:
     
     def get_ESUN(self,band):
         """
-        Passed due to NDA. New methods will be added soon 
+         New methods will be added soon 
         """
         pass
 

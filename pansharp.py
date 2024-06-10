@@ -11,10 +11,10 @@ class PanSharpening:
 
     def pan_sharpen(self,rgb_img,pan_img,save_path):
         """
-        Passed due to NDA. New methods will be added soon 
+        New methods will be added soon 
         """
         pass
-    
+
 
 
 def run_pansharp(save_path):

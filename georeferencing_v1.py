@@ -94,7 +94,7 @@ class getSatelliteInfo:
 
 class referenceDownload():
     """
-    Passed due to NDA. New code will be added soon.
+    New code will be added soon.
     
     """
 
@@ -102,7 +102,7 @@ from osgeo import gdal,ogr,osr
 
 class geoReferencing():
     """
-    Passed Due to NDA. New code will be added soon.
+     New code will be added soon.
     """
 
 

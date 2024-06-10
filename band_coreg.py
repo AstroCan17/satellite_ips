@@ -9,13 +9,13 @@ import level_1
 class BandRegister:
     def __init__(self, input_dict):
         """
-        Passed due to NDA. New methods will be added soon 
+        New methods will be added soon 
         """
         pass
-    
+
     def shifting_sift(self):
         """
-        Passed due to NDA. New methods will be added soon 
+         New methods will be added soon 
         """
         pass
       
